@@ -22,6 +22,7 @@
 #include <linux/msm_adreno_devfreq.h>
 #include <linux/of_device.h>
 #include <linux/thermal.h>
+#include <linux/binfmts.h>
 
 #include "kgsl.h"
 #include "kgsl_pwrscale.h"
@@ -1280,6 +1281,9 @@ static ssize_t kgsl_pwrctrl_min_clock_mhz_store(struct device *dev,
 	if (device == NULL)
 		return 0;
 
+	if (task_is_booster(current))
+		return count;
+
 	pwr = &device->pwrctrl;
 
 	ret = kgsl_sysfs_store(buf, &freq);
@@ -1320,6 +1324,9 @@ static ssize_t kgsl_pwrctrl_max_clock_mhz_store(struct device *dev,
 
 	if (device == NULL)
 		return 0;
+
+	if (task_is_booster(current))
+		return count;
 
 	ret = kgsl_sysfs_store(buf, &val);
 	if (ret)
